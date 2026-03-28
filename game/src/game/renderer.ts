@@ -9,13 +9,12 @@ export interface SpritePack {
   hurdle: string;
 }
 
-// Processed offscreen canvases (grey background removed)
 interface LoadedSprites {
-  canter: HTMLCanvasElement[];
-  jump: HTMLCanvasElement[];
-  car: HTMLCanvasElement[];
-  dog: HTMLCanvasElement[];
-  hurdle: HTMLCanvasElement | null;
+  canter: HTMLImageElement[];
+  jump: HTMLImageElement[];
+  car: HTMLImageElement[];
+  dog: HTMLImageElement[];
+  hurdle: HTMLImageElement | null;
   ready: boolean;
 }
 
@@ -28,32 +27,9 @@ const sprites: LoadedSprites = {
   ready: false,
 };
 
-// Remove the checkerboard grey background (both dark ~183 and light ~230 squares)
-// by zeroing alpha of any grey pixel in those ranges.
-function removeGreyBackground(img: HTMLImageElement): HTMLCanvasElement {
-  const canvas = document.createElement("canvas");
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
-  const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(img, 0, 0);
-  const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const d = data.data;
-  for (let i = 0; i < d.length; i += 4) {
-    const r = d[i], g = d[i + 1], b = d[i + 2];
-    const isGrey = Math.abs(r - g) < 12 && Math.abs(g - b) < 12;
-    const isDarkSquare = isGrey && r >= 168 && r <= 198;   // ~183
-    const isLightSquare = isGrey && r >= 220 && r <= 245;  // ~230
-    if (isDarkSquare || isLightSquare) {
-      d[i + 3] = 0; // make transparent
-    }
-  }
-  ctx.putImageData(data, 0, 0);
-  return canvas;
-}
-
-function loadProcessed(src: string, onDone: (canvas: HTMLCanvasElement) => void) {
+function loadImage(src: string, onDone: (img: HTMLImageElement) => void) {
   const img = new Image();
-  img.onload = () => onDone(removeGreyBackground(img));
+  img.onload = () => onDone(img);
   img.src = src;
 }
 
@@ -66,11 +42,11 @@ export function loadSpriteSheet(pack: SpritePack) {
     if (loaded === total) sprites.ready = true;
   }
 
-  pack.canter.forEach(src => loadProcessed(src, c => { sprites.canter.push(c); onOne(); }));
-  pack.jump.forEach(src => loadProcessed(src, c => { sprites.jump.push(c); onOne(); }));
-  pack.car.forEach(src => loadProcessed(src, c => { sprites.car.push(c); onOne(); }));
-  pack.dog.forEach(src => loadProcessed(src, c => { sprites.dog.push(c); onOne(); }));
-  loadProcessed(pack.hurdle, c => { sprites.hurdle = c; onOne(); });
+  pack.canter.forEach(src => loadImage(src, img => { sprites.canter.push(img); onOne(); }));
+  pack.jump.forEach(src => loadImage(src, img => { sprites.jump.push(img); onOne(); }));
+  pack.car.forEach(src => loadImage(src, img => { sprites.car.push(img); onOne(); }));
+  pack.dog.forEach(src => loadImage(src, img => { sprites.dog.push(img); onOne(); }));
+  loadImage(pack.hurdle, img => { sprites.hurdle = img; onOne(); });
 }
 
 function drawPlayer(ctx: CanvasRenderingContext2D, state: GameState) {
