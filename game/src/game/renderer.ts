@@ -56,9 +56,9 @@ function drawPlayer(ctx: CanvasRenderingContext2D, state: GameState) {
   if (sprites.ready && frames.length === 5) {
     const frame = frames[Math.floor(state.frameCount / 6) % frames.length];
     const drawW = width * 2.8;
-    const drawH = height * 2.2;
-    const drawX = x - drawW * 0.2;
-    const drawY = y - drawH * 0.35;
+    const drawH = height * 2.0;
+    const drawX = x - drawW * 0.3;
+    const drawY = y - drawH * 0.45;
     ctx.drawImage(frame, drawX, drawY, drawW, drawH);
   } else {
     ctx.fillStyle = "#E05090";
@@ -82,7 +82,7 @@ function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle, frameCount: 
       const drawH = obs.height * 1.8;
       const drawW = drawH * aspect;
       const drawX = px - (drawW - obs.width) * 0.5;
-      const drawY = py - (drawH - obs.height);
+      const drawY = py - (drawH - obs.height *1.1);
       ctx.save();
       ctx.scale(-1, 1);
       ctx.drawImage(frame, -drawX - drawW, drawY, drawW, drawH);
@@ -95,7 +95,7 @@ function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle, frameCount: 
       const drawH = obs.height * 2.0;
       const drawW = drawH * aspect;
       const drawX = px - (drawW - obs.width) * 0.5;
-      const drawY = py - (drawH - obs.height);
+      const drawY = py - (drawH - obs.height * 1.1);
       ctx.drawImage(frame, drawX, drawY, drawW, drawH);
       break;
     }
@@ -106,7 +106,7 @@ function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle, frameCount: 
       const drawH = obs.height * 1.6;
       const drawW = drawH * aspect;
       const drawX = px - (drawW - obs.width) * 0.5;
-      const drawY = py - (drawH - obs.height);
+      const drawY = py - (drawH - obs.height*1.1);
       ctx.drawImage(frame, drawX, drawY, drawW, drawH);
       break;
     }
