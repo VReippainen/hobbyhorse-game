@@ -51,8 +51,8 @@ export function jump(state: GameState): void {
 
 function spawnObstacle(state: GameState, canvasWidth: number): Obstacle {
   const types: ObstacleType[] = ["jump", "dog", "car"];
-  // Cars more frequent as score increases
-  const weights = [3, 3, 1 + Math.floor(state.score / 200)];
+  // Hurdles 5x more than dogs; cars increase with score
+  const weights = [5, 1, 1 + Math.floor(state.score / 200)];
   const totalWeight = weights.reduce((a, b) => a + b, 0);
   let r = Math.random() * totalWeight;
   let type: ObstacleType = "jump";

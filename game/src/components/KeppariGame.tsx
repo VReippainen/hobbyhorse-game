@@ -25,6 +25,8 @@ const CANVAS_HEIGHT = 300;
 const music = new Audio("/mini_doom.mp3");
 music.loop = true;
 
+const deathSound = new Audio("/death.wav");
+
 export default function KeppariGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<GameState>(createInitialState(CANVAS_HEIGHT));
@@ -71,7 +73,7 @@ export default function KeppariGame() {
   // Input listeners
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (phase === "menu") return;
+      if (phase === "menu") { startGame(); return; }
       if (e.code === "Space" || e.key === " ") {
         e.preventDefault();
         handleJump();
@@ -99,6 +101,8 @@ export default function KeppariGame() {
         setPhase("over");
         setHighScore(state.highScore);
         music.pause();
+        deathSound.currentTime = 0;
+        deathSound.play().catch(() => {/* autoplay blocked */});
 
         // Capture the frozen game frame, then animate WASTED on top
         const wastedCanvas = canvasRef.current;
@@ -166,9 +170,6 @@ export default function KeppariGame() {
             )}
           </div>
         </div>
-        <p className="font-pixel text-muted-foreground text-[8px] tracking-wider text-center">
-          SPACE / CLICK / TAP TO JUMP
-        </p>
       </div>
     );
   }

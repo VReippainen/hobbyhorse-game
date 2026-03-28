@@ -107,7 +107,10 @@ function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle, frameCount: 
       const drawW = drawH * aspect;
       const drawX = px - (drawW - obs.width) * 0.5;
       const drawY = py - (drawH - obs.height);
-      ctx.drawImage(frame, drawX, drawY, drawW, drawH);
+      ctx.save();
+      ctx.scale(-1, 1);
+      ctx.drawImage(frame, -drawX - drawW, drawY, drawW, drawH);
+      ctx.restore();
       break;
     }
     case "dog": {
