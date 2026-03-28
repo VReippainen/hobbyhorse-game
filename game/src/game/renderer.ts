@@ -176,7 +176,9 @@ export function renderWasted(
   ctx: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
   frozenFrame: ImageData,
-  opacity: number
+  opacity: number,
+  score: number,
+  highScore: number
 ) {
   const w = canvas.width;
   const h = canvas.height;
@@ -188,19 +190,66 @@ export function renderWasted(
   ctx.fillStyle = "rgba(160, 0, 0, 0.38)";
   ctx.fillRect(0, 0, w, h);
 
-  // WASTED text — fades in, ends fully opaque
   ctx.save();
   ctx.globalAlpha = opacity;
-  const fontSize = Math.min(w * 0.155, 130);
-  ctx.font = `900 ${fontSize}px "Arial Black", Impact, sans-serif`;
   ctx.textAlign = "center";
+  ctx.lineJoin = "round";
+
+  // WASTED text — shifted up slightly to make room below
+  const fontSize = Math.min(w * 0.155, 130);
+  const wastedY = h * 0.38;
+  ctx.font = `900 ${fontSize}px "Arial Black", Impact, sans-serif`;
   ctx.textBaseline = "middle";
   ctx.strokeStyle = "#000";
   ctx.lineWidth = fontSize * 0.09;
-  ctx.lineJoin = "round";
-  ctx.strokeText("WASTED", w / 2, h / 2);
+  ctx.strokeText("WASTED", w / 2, wastedY);
   ctx.fillStyle = "#C80000";
-  ctx.fillText("WASTED", w / 2, h / 2);
+  ctx.fillText("WASTED", w / 2, wastedY);
+
+  // Score + high score below WASTED
+  const sf = Math.min(w * 0.024, 18);
+  ctx.font = `${sf}px "Press Start 2P", monospace`;
+  ctx.textBaseline = "top";
+  const scoreY = wastedY + fontSize * 0.52 + 6;
+
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = sf * 0.2;
+  ctx.strokeText(`SCORE: ${score}`, w / 2, scoreY);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillText(`SCORE: ${score}`, w / 2, scoreY);
+
+  const bestY = scoreY + sf * 1.7;
+  if (highScore > 0) {
+    ctx.strokeText(`BEST: ${highScore}`, w / 2, bestY);
+    ctx.fillStyle = "rgba(255,255,255,0.65)";
+    ctx.fillText(`BEST: ${highScore}`, w / 2, bestY);
+  }
+
+  // PLAY AGAIN button drawn on canvas
+  const btnFontSize = Math.min(w * 0.02, 14);
+  const btnLabel = "\u25B6 PLAY AGAIN";
+  const btnPadX = btnFontSize * 2.2;
+  const btnPadY = btnFontSize * 0.9;
+  ctx.font = `${btnFontSize}px "Press Start 2P", monospace`;
+  const btnTextW = ctx.measureText(btnLabel).width;
+  const btnW = btnTextW + btnPadX * 2;
+  const btnH = btnFontSize + btnPadY * 2;
+  const btnX = w / 2 - btnW / 2;
+  const btnTopY = (highScore > 0 ? bestY : scoreY) + sf * 1.7 + 4;
+
+  ctx.fillStyle = "#C83010";
+  ctx.fillRect(btnX, btnTopY, btnW, btnH);
+  ctx.strokeStyle = "rgba(0,0,0,0.6)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(btnX, btnTopY, btnW, btnH);
+
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "#FFFFFF";
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = btnFontSize * 0.15;
+  ctx.strokeText(btnLabel, w / 2, btnTopY + btnH / 2);
+  ctx.fillText(btnLabel, w / 2, btnTopY + btnH / 2);
+
   ctx.restore();
 }
 

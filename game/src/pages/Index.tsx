@@ -2,7 +2,10 @@ import KeppariGame from "@/components/KeppariGame";
 
 const Index = () => {
   return (
-    <div className="h-screen bg-background flex flex-col items-center justify-center p-4 overflow-hidden">
+    <div
+      className="bg-background"
+      style={{ width: "100vw", height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden" }}
+    >
       <KeppariGame />
     </div>
   );

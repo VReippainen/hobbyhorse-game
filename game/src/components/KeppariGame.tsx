@@ -30,8 +30,6 @@ export default function KeppariGame() {
   const stateRef = useRef<GameState>(createInitialState(CANVAS_HEIGHT));
   const rafRef = useRef<number>(0);
   const [phase, setPhase] = useState<"menu" | "playing" | "over">("menu");
-  const [showGameOver, setShowGameOver] = useState(false);
-  const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(
     Number(localStorage.getItem("keppari_highscore") || "0")
   );
@@ -52,7 +50,6 @@ export default function KeppariGame() {
     stateRef.current = createInitialState(CANVAS_HEIGHT);
     stateRef.current.started = true;
     setPhase("playing");
-    setShowGameOver(false);
     jump(stateRef.current);
     music.currentTime = 0;
     music.play().catch(() => {/* autoplay blocked */});
@@ -100,7 +97,6 @@ export default function KeppariGame() {
 
       if (state.gameOver) {
         setPhase("over");
-        setScore(Math.floor(state.score));
         setHighScore(state.highScore);
         music.pause();
 
@@ -112,16 +108,17 @@ export default function KeppariGame() {
             const frozen = captureFrame(wastedCanvas);
             const start = performance.now();
             const FADE_MS = 700;
+            const finalScore = Math.floor(state.score);
+            const finalHighScore = state.highScore;
             const step = (now: number) => {
               const opacity = Math.min((now - start) / FADE_MS, 1);
-              renderWasted(wastedCtx, wastedCanvas, frozen, opacity);
+              renderWasted(wastedCtx, wastedCanvas, frozen, opacity, finalScore, finalHighScore);
               if (opacity < 1) requestAnimationFrame(step);
             };
             requestAnimationFrame(step);
           }
         }
 
-        setTimeout(() => setShowGameOver(true), 1200);
         return; // stop the loop
       }
 
@@ -134,16 +131,17 @@ export default function KeppariGame() {
   // Menu screen
   if (phase === "menu") {
     return (
-      <div className="flex flex-col items-center gap-6">
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "24px" }}>
         <div
-          className="relative flex flex-col items-center justify-center bg-background border-2 border-border rounded-sm"
-          style={{ width: CANVAS_WIDTH, maxWidth: "100%" }}
+          className="relative bg-background border-2 border-border rounded-sm"
+          style={{ width: CANVAS_WIDTH, maxWidth: "100vw", margin: "0 auto", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}
         >
-          <div className="flex flex-col items-center py-10 px-4">
+          <div className="flex flex-col items-center py-10 px-4 w-full text-center" style={{display: 'flex', flexDirection: "column", alignItems:"center"}}>
             <img
               src={logo}
               alt="Alisa's Hobbyhorse Adventure"
               className="w-40 h-40 object-contain mb-6"
+              style={{maxWidth: "200px"}}
             />
             <h2 className="font-pixel text-primary text-base mb-2 text-center tracking-wider">
               ALISA'S HOBBYHORSE
@@ -168,7 +166,7 @@ export default function KeppariGame() {
             )}
           </div>
         </div>
-        <p className="font-pixel text-muted-foreground text-[8px] tracking-wider">
+        <p className="font-pixel text-muted-foreground text-[8px] tracking-wider text-center">
           SPACE / CLICK / TAP TO JUMP
         </p>
       </div>
@@ -191,22 +189,6 @@ export default function KeppariGame() {
           }}
         />
 
-        {/* Score + play again — fades in below canvas after WASTED */}
-        {phase === "over" && (
-          <div
-            className="absolute inset-x-0 bottom-0 flex flex-col items-center pb-4 transition-opacity duration-500"
-            style={{ opacity: showGameOver ? 1 : 0, zIndex: 10 }}
-          >
-            <p className="font-pixel text-white text-sm mb-1 drop-shadow">SCORE: {score}</p>
-            <p className="font-pixel text-white/70 text-[10px] mb-4 drop-shadow">BEST: {highScore}</p>
-            <button
-              onClick={startGame}
-              className="font-pixel text-xs bg-primary text-primary-foreground px-6 py-3 rounded-sm hover:opacity-90 transition-opacity"
-            >
-              PLAY AGAIN
-            </button>
-          </div>
-        )}
       </div>
 
       <p className="font-pixel text-muted-foreground text-[8px] tracking-wider">
